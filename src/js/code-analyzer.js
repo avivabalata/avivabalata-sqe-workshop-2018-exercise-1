@@ -7,7 +7,7 @@ export {statements};
 export {statement};
 
 let statementFunc = new Map();
-const statements = new Array();
+let statements = new Array();
 
 let row = 1;
 const statement = function () {
@@ -22,7 +22,6 @@ const statement = function () {
 const parseCode = (codeToParse) => {
     return esprima.parseScript(codeToParse);
 };
-
 
 
 function start() {
@@ -48,13 +47,7 @@ const parse = (jsonFile)=>{
 
     start();
     let currentBody = jsonFile.body[0];
-    // function statement
     statementFunc[currentBody.type].call(undefined, currentBody);
-
-    // Block statement
-    statementFunc[currentBody.body.type].call(undefined, currentBody.body);
-
-    console.log(statements);
     return statements;
 }
 
@@ -79,6 +72,8 @@ function parseFunction(currentBody) {
         }
     }
     row++;
+
+    statementFunc[currentBody.body.type].call(undefined, currentBody.body);
 }
 
 function parseVariable(item) {

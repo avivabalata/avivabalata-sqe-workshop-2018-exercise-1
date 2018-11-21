@@ -18,18 +18,41 @@ describe('The javascript parser to json', () => {
     });
 });
 describe('The parse function', () => {
-    let node ='{"type":"Program","body":[{"body":{"type":"BlockStatement", "body":[]}, "id":{"name":"func","type":"Identifier"}, "params":[], "type":"FunctionDeclaration"}],"sourceType":"script"}';
+    let node = '{"type":"Program","body":[{"body":{"type":"BlockStatement", "body":[]}, "id":{"name":"func","type":"Identifier"}, "params":[{"name":"x", "type":"Identifier"}], "type":"FunctionDeclaration"}],"sourceType":"script"}';
     it('is first statement is Function', () => {
         assert.equal(
             parse(JSON.parse(node))[0].type,
             'FunctionDeclaration'
         );
     });
-
-    // it('is second statement is block', () => {
-    //     assert.equal(
-    //         parse(JSON.parse(node))[1].type,
-    //         'BlockStatement'
-    //     );
-    // });
+    it('is first statement is Function', () => {
+        assert.equal(
+            parse(JSON.parse(node))[1].type,
+            'Identifier'
+        );
+    });
 });
+// describe('The variables declaration', () => {
+//     let node = '{"type":"VariableDeclaration", "kind":"let", "declarations":[{"type":"VariableDeclarator", "id":{"type":"Identifier", "name":"x"}}]}';
+//     it('is first statement is varable', () => {
+//         assert.equal(
+//             parse(JSON.parse(node))[0].type,
+//             'VariableDeclaration'
+//         );
+//     });
+//     it('is first statement is Function', () => {
+//         assert.equal(
+//             parse(JSON.parse(node))[0].name,
+//             'x'
+//         );
+//     });
+// });
+// describe('The parse function parameters', () => {
+//     let node = '{"type":"Program","body":[{"body":{"type":"BlockStatement", "body":[]}, "id":{"name":"func","type":"Identifier"}, "params":[{"name":"x", "type":"Identifier"}], "type":"FunctionDeclaration"}],"sourceType":"script"}';
+//     it('is second statement is parameter', () => {
+//         assert.equal(
+//             parse(JSON.parse(node))[1].type,
+//             'Identifier'
+//         );
+//     });
+// });
