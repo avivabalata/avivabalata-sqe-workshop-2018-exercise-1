@@ -224,6 +224,3 @@ function parseUpdateExpression(item){
     let op = item.operator;
     return arg+op;
 }
-$(document).ready(function () {
-
-});
