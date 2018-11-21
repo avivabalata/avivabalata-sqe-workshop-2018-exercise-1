@@ -3,11 +3,14 @@ import $ from 'jquery';
 export {parse};
 export {start};
 export {parseCode};
+export {statements};
+export {statement};
 
 let statementFunc = new Map();
-let statements = new Array();
+const statements = new Array();
+
 let row = 1;
-let statement = function () {
+const statement = function () {
     this.line = 0;
     this.type = null;
     this.name = null;
@@ -43,6 +46,7 @@ function start() {
 
 const parse = (jsonFile)=>{
 
+    start();
     let currentBody = jsonFile.body[0];
     // function statement
     statementFunc[currentBody.type].call(undefined, currentBody);
@@ -50,6 +54,7 @@ const parse = (jsonFile)=>{
     // Block statement
     statementFunc[currentBody.body.type].call(undefined, currentBody.body);
 
+    console.log(statements);
     return statements;
 }
 

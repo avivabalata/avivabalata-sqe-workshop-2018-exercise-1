@@ -11,6 +11,8 @@ $(document).ready(function () {
         start();
         let jsonFile = parseCode(codeToParse);
         let parsedCode = parse(jsonFile);
+
+        window.alert(parsedCode)
         $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
 
         $('#showTable').show()
