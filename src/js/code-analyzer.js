@@ -26,6 +26,7 @@ const parseCode = (codeToParse) => {
 
 function start() {
     row = 1 ;
+    statements = new Array();
     statementFunc['BlockStatement'] = parseBlockStatement;
     statementFunc['FunctionDeclaration'] = parseFunction;
     statementFunc['ExpressionStatement'] = getExpresion;
@@ -60,7 +61,6 @@ function parseFunction(currentBody) {
     state.condition = '';
     state.value = '';
     statements.push(state);
-    if(currentBody.params.length > 0){
         for(let j=0;j<currentBody.params.length;j++){
             let state = new statement();
             state.line = row;
@@ -70,7 +70,6 @@ function parseFunction(currentBody) {
             state.value = '';
             statements.push(state);
         }
-    }
     row++;
 
     statementFunc[currentBody.body.type].call(undefined, currentBody.body);
@@ -142,7 +141,6 @@ function parseforStatement(item) {
 function parseIfStatement(item) {
 
     let ifstate = new statement();
-    if(item.test !== undefined){
         ifstate.line = row;
         ifstate.type = item.type;
         ifstate.condition = statementFunc[item.test.type].call(undefined, item.test);
@@ -152,12 +150,13 @@ function parseIfStatement(item) {
         row++;
         statementFunc[item.consequent.type].call(undefined, item.consequent);
         row++;
-    }
-    if(item.alternate.type == 'IfStatement'){
+
+    if(item.alternate){
+    if( item.alternate.type == 'IfStatement'){
         elseIf(item.alternate);
     } else {
         statementFunc[item.alternate.type].call(undefined, item.alternate);
-    }
+    }} else {}
 }
 function elseIf(item) {
     let ifstate = new statement();
@@ -171,11 +170,13 @@ function elseIf(item) {
     statementFunc[item.consequent.type].call(undefined, item.consequent);
     row++;
 
-    if(item.alternate.type == 'IfStatement'){
-        elseIf(item.alternate);
-    } else {
-        statementFunc[item.alternate.type].call(undefined, item.alternate);
-    }
+    if(item.alternate){
+        if( item.alternate.type == 'IfStatement'){
+            elseIf(item.alternate);
+        } else {
+            statementFunc[item.alternate.type].call(undefined, item.alternate);
+        }
+    } else {}
 }
 function parseWhile(item) {
     let state = new statement();
@@ -212,12 +213,12 @@ function parseMemberExpression(item) {
 function parseBinaryExpresion(item) {
     let left = statementFunc[item.left.type].call(undefined, item.left);
     let right = statementFunc[item.right.type].call(undefined, item.right);
-    return left+''+item.operator+right;
+    return left+item.operator+right;
 }
 function parseUnaryExpression(item) {
     let arg = statementFunc[item.argument.type].call(undefined, item.argument);
     let op = item.operator;
-    return op+''+arg;
+    return op+arg;
 }
 function parseUpdateExpression(item){
     let arg = statementFunc[item.argument.type].call(undefined, item.argument);
