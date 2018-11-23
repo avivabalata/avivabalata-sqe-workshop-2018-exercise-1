@@ -51,7 +51,7 @@ const parse = (jsonFile)=>{
     statementFunc[currentBody.type].call(undefined, currentBody);
     return statements;
 };
-
+/////////////////
 function parseFunction(currentBody) {
     let state = new statement();
     state.line = row;
