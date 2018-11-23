@@ -22,7 +22,6 @@ const parseCode = (codeToParse) => {
     return esprima.parseScript(codeToParse);
 };
 
-
 function start() {
     row = 1 ;
     statements = new Array();
@@ -51,7 +50,7 @@ const parse = (jsonFile)=>{
     statementFunc[currentBody.type].call(undefined, currentBody);
     return statements;
 };
-/////////////////
+
 function parseFunction(currentBody) {
     let state = new statement();
     state.line = row;
@@ -100,7 +99,8 @@ function parseBlockStatement(arry)
     let current = arry.body;
     for(let k=0;k<current.length;k++){
         statementFunc[current[k].type].call(undefined, current[k]);
-        row++;
+        if(k != current.length-1)
+            row++;
     }
 }
 function getExpresion(item)
@@ -152,7 +152,7 @@ function parseIfStatement(item) {
             elseIf(item.alternate);} else {
             statementFunc[item.alternate.type].call(undefined, item.alternate);
         }} else {
-        ///
+        row--;
     }
 }
 
@@ -173,7 +173,7 @@ function elseIf(item) {
             statementFunc[item.alternate.type].call(undefined, item.alternate);
         }
     } else {
-        //
+        row--;
     }
 }
 function parseWhile(item) {

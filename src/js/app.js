@@ -11,16 +11,14 @@ $(document).ready(function () {
         start();
         let jsonFile = parseCode(codeToParse);
         let parsedCode = parse(jsonFile);
-
-        window.alert(parsedCode);
-        $('#parsedCode').val(JSON.stringify(jsonFile, null, 2).replace('\n',''));
-
-        $('#showTable').show();
+        $('#showTable').empty();
+        $('#showTable').append('<tr style="font-weight: bold"><td>Line</td><td>Type</td><td>Name</td><td>Condition</td><td>Value</td></tr>');
         for(let i=0;i<parsedCode.length;i++) {
             let condition = parsedCode[i].condition.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             $('#showTable').append('<tr><td>'+parsedCode[i].line.toString() +'</td><td>'+ parsedCode[i].type.toString()+'</td><td>'
               +parsedCode[i].name.toString()+'</td><td>'+condition+'</td><td>'+parsedCode[i].value.toString()+'</td></tr>');
         }
+        $('#showTable').show();
 
     });
 });
