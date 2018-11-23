@@ -1,5 +1,4 @@
 import * as esprima from 'esprima';
-import $ from 'jquery';
 export {parse};
 export {start};
 export {parseCode};
@@ -42,6 +41,7 @@ function start() {
     statementFunc['MemberExpression'] = parseMemberExpression;
     statementFunc['ForStatement'] = parseforStatement;
     statementFunc['UpdateExpression'] = parseUpdateExpression;
+    statementFunc['LogicalExpression'] = parselogicalExpresion;
 }
 
 const parse = (jsonFile)=>{
@@ -50,10 +50,9 @@ const parse = (jsonFile)=>{
     let currentBody = jsonFile.body[0];
     statementFunc[currentBody.type].call(undefined, currentBody);
     return statements;
-}
+};
 
 function parseFunction(currentBody) {
-
     let state = new statement();
     state.line = row;
     state.name = currentBody.id.name;
@@ -61,17 +60,16 @@ function parseFunction(currentBody) {
     state.condition = '';
     state.value = '';
     statements.push(state);
-        for(let j=0;j<currentBody.params.length;j++){
-            let state = new statement();
-            state.line = row;
-            state.name = currentBody.params[j].name;
-            state.type = currentBody.params[j].type;
-            state.condition = '';
-            state.value = '';
-            statements.push(state);
-        }
+    for(let j=0;j<currentBody.params.length;j++){
+        let state = new statement();
+        state.line = row;
+        state.name = currentBody.params[j].name;
+        state.type = currentBody.params[j].type;
+        state.condition = '';
+        state.value = '';
+        statements.push(state);
+    }
     row++;
-
     statementFunc[currentBody.body.type].call(undefined, currentBody.body);
 }
 
@@ -139,25 +137,25 @@ function parseforStatement(item) {
 }
 
 function parseIfStatement(item) {
-
     let ifstate = new statement();
-        ifstate.line = row;
-        ifstate.type = item.type;
-        ifstate.condition = statementFunc[item.test.type].call(undefined, item.test);
-        ifstate.value = '';
-        ifstate.name = '';
-        statements.push(ifstate);
-        row++;
-        statementFunc[item.consequent.type].call(undefined, item.consequent);
-        row++;
-
+    ifstate.line = row;
+    ifstate.type = item.type;
+    ifstate.condition = statementFunc[item.test.type].call(undefined, item.test);
+    ifstate.value = '';
+    ifstate.name = '';
+    statements.push(ifstate);
+    row++;
+    statementFunc[item.consequent.type].call(undefined, item.consequent);
+    row++;
     if(item.alternate){
-    if( item.alternate.type == 'IfStatement'){
-        elseIf(item.alternate);
-    } else {
-        statementFunc[item.alternate.type].call(undefined, item.alternate);
-    }} else {}
+        if( item.alternate.type == 'IfStatement'){
+            elseIf(item.alternate);} else {
+            statementFunc[item.alternate.type].call(undefined, item.alternate);
+        }} else {
+        ///
+    }
 }
+
 function elseIf(item) {
     let ifstate = new statement();
     ifstate.line = row;
@@ -169,14 +167,14 @@ function elseIf(item) {
     row++;
     statementFunc[item.consequent.type].call(undefined, item.consequent);
     row++;
-
     if(item.alternate){
         if( item.alternate.type == 'IfStatement'){
-            elseIf(item.alternate);
-        } else {
+            elseIf(item.alternate);} else {
             statementFunc[item.alternate.type].call(undefined, item.alternate);
         }
-    } else {}
+    } else {
+        //
+    }
 }
 function parseWhile(item) {
     let state = new statement();
@@ -224,4 +222,9 @@ function parseUpdateExpression(item){
     let arg = statementFunc[item.argument.type].call(undefined, item.argument);
     let op = item.operator;
     return arg+op;
+}
+function parselogicalExpresion(item) {
+    let left = statementFunc[item.left.type].call(undefined, item.left);
+    let right = statementFunc[item.right.type].call(undefined, item.right);
+    return left+item.operator+right;
 }

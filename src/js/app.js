@@ -12,12 +12,12 @@ $(document).ready(function () {
         let jsonFile = parseCode(codeToParse);
         let parsedCode = parse(jsonFile);
 
-        window.alert(parsedCode)
+        window.alert(parsedCode);
         $('#parsedCode').val(JSON.stringify(jsonFile, null, 2).replace('\n',''));
 
-        $('#showTable').show()
+        $('#showTable').show();
         for(let i=0;i<parsedCode.length;i++) {
-            let condition = parsedCode[i].condition.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            let condition = parsedCode[i].condition.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             $('#showTable').append('<tr><td>'+parsedCode[i].line.toString() +'</td><td>'+ parsedCode[i].type.toString()+'</td><td>'
               +parsedCode[i].name.toString()+'</td><td>'+condition+'</td><td>'+parsedCode[i].value.toString()+'</td></tr>');
         }

@@ -1,36 +1,5 @@
 import assert from 'assert';
 import {parseCode, parse} from '../src/js/code-analyzer';
-import {statements, statement} from '../src/js/code-analyzer';
-
-let func = 'function binarySearch(X, V, n){\n' +
-    '    let low, high, mid, index;\n' +
-    '    low = 0;\n' +
-    '    high = n - 1;\n' +
-    '    if( x > 1)\n' +
-    '        low = 1;\n' +
-    '    for(let i=0;i<9;i++) {\n' +
-    '        if (i < 5) \n' +
-    '            index = index + 1;\n' +
-    '        else\n' +
-    '            index = 0;\n' +
-    '    }\n' +
-    '    while (low <= high) {\n' +
-    '        mid = (low + high)/2;\n' +
-    '        if (X < V[mid])\n' +
-    '            high = mid - 1;\n' +
-    '        else if (X > V[mid])\n' +
-    '            low = mid + 1;\n' +
-    '        else if (X == V[mid])\n' +
-    '            return mid;\n' +
-    '        else\n' +
-    '            return 0;\n' +
-    '        if (X < V[mid])\n' +
-    '            high = mid - 1;\n' +
-    '        else if (X > V[mid])\n' +
-    '            low = mid + 1;\n' +
-    '    }\n' +
-    '    return -1;\n' +
-    '}';
 
 
 describe('The javascript parser to json', () => {
@@ -50,15 +19,15 @@ describe('The javascript parser to json', () => {
 });
 
 
-describe('The parse function to statements', () => {
+describe('The function parser', () => {
     let node = '{"type":"Program","body":[{"body":{"type":"BlockStatement", "body":[]}, "id":{"name":"func","type":"Identifier"}, "params":[{"name":"x", "type":"Identifier"}], "type":"FunctionDeclaration"}],"sourceType":"script"}';
-    it('is first statement is type Function', () => {
+    it('is not the correct type Function', () => {
         assert.equal(
             parse(JSON.parse(node))[0].type,
             'FunctionDeclaration'
         );
     });
-    it('is second statement is type identifier', () => {
+    it('dont parse correct the parameters', () => {
         assert.equal(
             parse(JSON.parse(node))[1].type,
             'Identifier'
@@ -66,88 +35,163 @@ describe('The parse function to statements', () => {
     });
 });
 
-describe('check variables declaration', () => {
+describe('The variables declaration parser ', () => {
 
     let node1 = '{"type":"Program","body":[{"type":"VariableDeclaration", "kind":"let", "declarations":[{"type":"VariableDeclarator", "id":{"type":"Identifier", "name":"x"}}]}],"sourceType":"script"}';
-    it('is first statement type is variable', () => {
+    it('dont parse correct the declaration type', () => {
         assert.equal(parse(JSON.parse(node1))[0].type,'VariableDeclarator');
     });
-    it('is first statement name is x', () => {
+    it('dont parse correct the declaration name : x', () => {
         assert.equal(parse(JSON.parse(node1))[0].name,'x');
     });
 });
 
-let parsed = parseCode(func);
+describe('The assignment expression parser', () => {
 
-describe('check assignment expression', () => {
-    it('is expression in right place', () => {
+    let text = 'high = n - 1;';
+    it('dont parse correct the expression type ', () => {
         assert.equal(
-            parse(parsed)[8].type,
+            parse(parseCode(text))[0].type,
+            'AssignmentExpression'
+        );});
+    it('dont parse correct the expression name', () => {
+        assert.equal(
+            parse(parseCode(text))[0].name,
+            'high'
+        );});
+    it('dont parse correct the expression value', () => {
+        assert.equal(
+            parse(parseCode(text))[0].value,
+            'n-1'
+        );});
+});
+
+describe('The complex expressions parser', () => {
+    let text =  'mid = (low + high)/2';
+    it('dont parse correct the expression type', () => {
+        assert.equal(
+            parse(parseCode(text))[0].type,
             'AssignmentExpression'
         );
     });
-    it('is expression is right name and value', () => {
+    it('dont parse correct the expression name', () => {
         assert.equal(
-            parse(parsed)[8].name,
-            'low'
-        );
-        assert.equal(
-            parse(parsed)[8].value,
-            '0'
+            parse(parseCode(text))[0].name,
+            'mid'
         );
     });
 });
 
-///// continue
-describe('check complex expressions', () => {
-    it('is second statement is parameter', () => {
+describe('The member expressions parser', () => {
+    let text =  'x = V[mid]';
+    it('dont parse correct the expression type', () => {
         assert.equal(
-            parse(parsed)[10].type,
+            parse(parseCode(text))[0].type,
+            'AssignmentExpression'
+        );
+    });
+    it('dont parse correct the expression name', () => {
+        assert.equal(
+            parse(parseCode(text))[0].name,
+            'x'
+        );
+    });
+});
+
+
+describe('The simple if statements parser', () => {
+    let text = 'if( x > 1)\n' +
+    '        low = 1;';
+    it('dont parse correct the statement type', () => {
+        assert.equal(
+            parse(parseCode(text))[0].type,
             'IfStatement'
         );
     });
 });
 
-describe('check if statements', () => {
-    it('is second statement is parameter', () => {
+describe('The if with else statements parser', () => {
+    let text = 'if ((i < 5) && (index < 9)) \n' +
+    '            index = index + 1;\n' +
+    '        else\n' +
+    '            index = 0;';
+    it('dont parse correct the statement IF type', () => {
         assert.equal(
-            parse(parsed)[10].type,
+            parse(parseCode(text))[0].type,
             'IfStatement'
         );
     });
 });
 
-describe('check else if statements', () => {
-    it('is second statement is parameter', () => {
+describe('The elseIf statements parser', () => {
+    let text = 'if (X < V[mid])\n' +
+        '            high = mid - 1;\n' +
+        '        else if (X > V[mid])\n' +
+        '            low = mid + 1;\n';
+    it('dont parse correct the statement IF type', () => {
         assert.equal(
-            parse(parsed)[10].type,
+            parse(parseCode(text))[0].type,
             'IfStatement'
         );
     });
-});
-
-describe('check for statements', () => {
-    it('is second statement is parameter', () => {
+    it('dont parse correct the statement ELSE IF type', () => {
         assert.equal(
-            parse(parsed)[12].type,
-            'ForStatement'
-        );
-    });
-});
-describe('check while statements', () => {
-    it('is second statement is parameter', () => {
-        assert.equal(
-            parse(parsed)[12].type,
-            'ForStatement'
+            parse(parseCode(text))[2].type,
+            'elseIfStatement'
         );
     });
 });
 
-describe('check return statements', () => {
-    it('is second statement is parameter', () => {
+describe('The complex else if statements parser', () => {
+    let text = 'if (X < V[mid])\n' +
+    '            high = mid - 1;\n' +
+    '        else if (X > V[mid])\n' +
+    '            low = mid + 1;\n' +
+    '        else if (X > V[mid])\n' +
+    '            low = mid + 1;\n' +
+    '        else \n' +
+    '            low = -1;\n';
+    it('dont parse correct the statement IF type', () => {
         assert.equal(
-            parse(parsed)[12].type,
+            parse(parseCode(text))[0].type,
+            'IfStatement'
+        );});
+    it('dont parse correct the statement ELSE IF type', () => {
+        assert.equal(
+            parse(parseCode(text))[2].type,
+            'elseIfStatement'
+        );});
+});
+
+describe('The for statements parser', () => {
+    let text = 'for(let i=0;i<9;i++) {\n' +
+        '    }';
+    it('dont parse correct the statement type', () => {
+        assert.equal(
+            parse(parseCode(text))[0].type,
             'ForStatement'
+        );
+    });
+});
+
+describe('The while statements parser', () => {
+    let text = 'while (low <= high) { \n' +
+        'let x = 0;' +
+        'let y = 0;}';
+    it('dont parse correct the statement type', () => {
+        assert.equal(
+            parse(parseCode(text))[0].type,
+            'WhileStatement'
+        );
+    });
+});
+
+describe('The return statements parser', () => {
+    let text = 'function binarySearch(){ return 0;}';
+    it('dont parse correct the statement type', () => {
+        assert.equal(
+            parse(parseCode(text))[1].type,
+            'ReturnStatement'
         );
     });
 });
